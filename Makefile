@@ -27,5 +27,5 @@ build-serve:
 build: clean build-serve
 
 
-run: build
+run:
 	./bin/$(SERVE_NAME)
