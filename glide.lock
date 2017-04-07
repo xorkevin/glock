@@ -1,5 +1,5 @@
-hash: 53e7fbf3ca378171d3c60a63352c7eac384fc109d68c290bcfb7250f2d0cd6a6
-updated: 2017-04-06T01:34:07.369078868-07:00
+hash: 53ad133ddf678f92bc38a289794cb2cf9e5f90f6a3dd5c1d9eb7f4a1baaadf51
+updated: 2017-04-07T08:29:02.342710574-07:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
@@ -18,6 +18,8 @@ imports:
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
+- name: github.com/sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/valyala/bytebufferpool
   version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
 - name: github.com/valyala/fasttemplate

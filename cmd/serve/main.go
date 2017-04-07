@@ -6,5 +6,5 @@ import (
 
 func main() {
 	g := server.New()
-	g.Start("8080")
+	g.Start(8080)
 }
