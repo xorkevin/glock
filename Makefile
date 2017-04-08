@@ -64,9 +64,9 @@ docker: docker-build docker-run
 
 
 ## postgres
-setup-pg:
+pg-setup:
   docker volume create --name $(POSTGRES_VOLUME)
 
 
-run-pg:
+pg-run:
   docker run -it --rm --name $(POSTGRES_CONTAINER) -p 5432:5432 -v $(POSTGRES_VOLUME):/var/lib/postgresql/data -e POSTGRES_PASSWORD=$(POSTGRES_PASS) postgres:alpine
