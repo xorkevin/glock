@@ -29,7 +29,7 @@ all: build
 
 
 dev: $(SERVE_PATH)
-  go run $(SERVE_PATH)
+  VERSION=$(VERSION) go run $(SERVE_PATH)
 
 
 clean:

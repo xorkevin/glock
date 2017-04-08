@@ -1,13 +1,15 @@
 package main
 
 import (
-	rHealth "github.com/xorkevin/glock/routes/health"
-	"github.com/xorkevin/glock/server"
+	"github.com/xorkevin/glock"
+	"github.com/xorkevin/glock/service/health"
 )
 
 func main() {
-	g := server.New(server.NewConfig())
-	g.SetLoggingLevel(server.LevelDebug)
-	g.RegisterRoute("/api/health", rHealth.Route)
+	g := glock.New(glock.NewConfig(glock.LevelDebug))
+
+	hS := health.New()
+
+	g.MountRoute("/api/health", hS)
 	g.Start(8080)
 }
