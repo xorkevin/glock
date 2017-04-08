@@ -90,7 +90,11 @@ func (c *Config) IsDebug() bool {
 func New(config Config) *Server {
 	// logger
 	l := logrus.New()
-	l.Formatter = &logrus.TextFormatter{}
+	if config.IsDebug() {
+		l.Formatter = &logrus.TextFormatter{}
+	} else {
+		l.Formatter = &logrus.JSONFormatter{}
+	}
 	l.Out = os.Stdout
 	l.Level = levelToLog(config.LogLevel)
 

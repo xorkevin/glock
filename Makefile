@@ -11,6 +11,7 @@ SERVE_NAME=serve
 SERVE_PATH=cmd/serve/main.go
 SERVE_BIN_PATH=$(BIN_OUT)/$(SERVE_NAME)
 
+
 # DOCKER
 SERVE_IMAGE_NAME=glockserver
 SERVE_CONTAINER_NAME=sglock
