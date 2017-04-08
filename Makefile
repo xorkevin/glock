@@ -6,6 +6,12 @@ SERVE_NAME=serve
 SERVE_PATH=cmd/serve/main.go
 SERVE_BIN_PATH=$(BIN_OUT)/$(SERVE_NAME)
 
+PORT=8080
+
+SERVE_IMAGE_NAME=glockserver
+SERVE_CONTAINER_NAME=sglock
+VERSION=v1
+
 
 all: build
 
@@ -28,4 +34,17 @@ build: clean build-serve
 
 
 run:
-	./bin/$(SERVE_NAME)
+	./$(SERVE_BIN_PATH)
+
+
+## docker
+build-docker: build
+	docker build -t $(SERVE_IMAGE_NAME):$(VERSION) .
+	docker build -t $(SERVE_IMAGE_NAME) .
+
+
+run-docker:
+	docker run -it --rm --name $(SERVE_CONTAINER_NAME) -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
+
+
+docker: build-docker run-docker
