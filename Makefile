@@ -29,7 +29,7 @@ all: build
 
 
 dev: $(SERVE_PATH)
-  VERSION=$(VERSION) go run $(SERVE_PATH)
+  VERSION=$(VERSION) MODE=DEBUG go run $(SERVE_PATH)
 
 
 clean:
@@ -46,20 +46,20 @@ build: clean build-serve
 
 
 run:
-  ./$(SERVE_BIN_PATH)
+  VERSION=$(VERSION) MODE=INFO ./$(SERVE_BIN_PATH)
 
 
 ## docker
-build-docker: build
+docker-build: build
   docker build -t $(SERVE_IMAGE_NAME):$(VERSION) .
   docker build -t $(SERVE_IMAGE_NAME) .
 
 
-run-docker:
-  docker run -it --rm --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
+docker-run:
+  docker run -it --rm --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -e MODE=INFO -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
 
 
-docker: build-docker run-docker
+docker: docker-build docker-run
 
 
 ## postgres

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	g := glock.New(glock.NewConfig(glock.LevelDebug))
+	g := glock.New(glock.NewConfig())
 
 	hS := health.New()
 

@@ -31,9 +31,15 @@ func (h *Health) Mount(conf glock.Config, r *echo.Group, l *logrus.Logger) error
 	r.GET("/version", func(c echo.Context) error {
 		return c.String(http.StatusOK, conf.Version)
 	})
-	r.GET("/ping", func(c echo.Context) error {
-		l.Debug("Ping")
-		return c.String(http.StatusOK, "Pong")
-	})
+	if conf.IsDebug() {
+		r.GET("/ping", func(c echo.Context) error {
+			l.WithFields(logrus.Fields{
+				"service":  "health",
+				"action":   "ping",
+				"response": "pong",
+			}).Info("Ping")
+			return c.String(http.StatusOK, "Pong")
+		})
+	}
 	return nil
 }

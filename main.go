@@ -23,46 +23,67 @@ type (
 	}
 )
 
-// NewConfig creates a new server configuration
-func NewConfig(loglevel int) Config {
-	return Config{
-		Version:  os.Getenv("VERSION"),
-		LogLevel: loglevel,
+const (
+	levelDebug = iota
+	levelInfo
+	levelWarn
+	levelError
+	levelFatal
+	levelPanic
+)
+
+func envToLevel(e string) int {
+	switch e {
+	case "DEBUG":
+		return levelDebug
+	case "INFO":
+		return levelInfo
+	case "WARN":
+		return levelWarn
+	case "ERROR":
+		return levelError
+	case "FATAL":
+		return levelFatal
+	case "PANIC":
+		return levelPanic
+	default:
+		return levelInfo
 	}
 }
 
-const (
-	// LevelDebug is the Debug logging level
-	LevelDebug = iota
-	// LevelInfo is the Info logging level
-	LevelInfo
-	// LevelWarning is the Warning logging level
-	LevelWarning
-	// LevelError is the Error logging level
-	LevelError
-	// LevelFatal is the Fatal logging level
-	LevelFatal
-	// LevelPanic is the Panic logging level
-	LevelPanic
-)
-
 func levelToLog(level int) logrus.Level {
 	switch level {
-	case LevelDebug:
+	case levelDebug:
 		return logrus.DebugLevel
-	case LevelInfo:
+	case levelInfo:
 		return logrus.InfoLevel
-	case LevelWarning:
+	case levelWarn:
 		return logrus.WarnLevel
-	case LevelError:
+	case levelError:
 		return logrus.ErrorLevel
-	case LevelFatal:
+	case levelFatal:
 		return logrus.FatalLevel
-	case LevelPanic:
+	case levelPanic:
 		return logrus.PanicLevel
 	default:
 		return logrus.InfoLevel
 	}
+}
+
+// NewConfig creates a new server configuration
+// It requires ENV vars:
+//   VERSION
+//   MODE
+func NewConfig() Config {
+	return Config{
+		Version:  os.Getenv("VERSION"),
+		LogLevel: envToLevel(os.Getenv("MODE")),
+	}
+}
+
+// IsDebug returns if the configuration is in debug mode
+func (c *Config) IsDebug() bool {
+	return c.LogLevel == levelDebug
 }
 
 // New creates a new Server
@@ -77,8 +98,10 @@ func New(config Config) *Server {
 	i := echo.New()
 
 	// middleware
-	if config.LogLevel == LevelDebug {
-		i.Use(middleware.Logger())
+	if config.LogLevel == levelDebug {
+		i.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: "time=${time_rfc3339}, method=${method}, uri=${uri}, status=${status}, latency=${latency_human}\n",
+		}))
 	}
 	i.Use(middleware.Recover())
 	i.Use(middleware.RemoveTrailingSlash())
