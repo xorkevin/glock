@@ -4,10 +4,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
-	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 type (
@@ -33,25 +31,6 @@ func New() *Server {
 	i.Use(middleware.Recover())
 	i.Use(middleware.RemoveTrailingSlash())
 
-	// routes
-	i.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-
-	// api routes
-	api := i.Group("/api")
-	api.GET("/health", func(c echo.Context) error {
-		t, err := time.Now().MarshalText()
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-		}
-		return c.String(http.StatusOK, string(t))
-	})
-	api.GET("/ping", func(c echo.Context) error {
-		l.Debug("Ping")
-		return c.String(http.StatusOK, "Pong")
-	})
-
 	return &Server{
 		i:   i,
 		log: l,
@@ -62,4 +41,49 @@ func New() *Server {
 func (s *Server) Start(port uint) error {
 	s.i.Logger.Fatal(s.i.Start(":" + strconv.Itoa(int(port))))
 	return nil
+}
+
+const (
+	// LevelDebug is the Debug logging level
+	LevelDebug = iota
+	// LevelInfo is the Info logging level
+	LevelInfo
+	// LevelWarning is the Warning logging level
+	LevelWarning
+	// LevelError is the Error logging level
+	LevelError
+	// LevelFatal is the Fatal logging level
+	LevelFatal
+	// LevelPanic is the Panic logging level
+	LevelPanic
+)
+
+// SetLoggingLevel sets the logger level
+func (s *Server) SetLoggingLevel(level int) {
+	k := logrus.InfoLevel
+	switch level {
+	case LevelDebug:
+		k = logrus.DebugLevel
+	case LevelInfo:
+		k = logrus.InfoLevel
+	case LevelWarning:
+		k = logrus.WarnLevel
+	case LevelError:
+		k = logrus.ErrorLevel
+	case LevelFatal:
+		k = logrus.FatalLevel
+	case LevelPanic:
+		k = logrus.PanicLevel
+	}
+	s.log.Level = k
+}
+
+type (
+	// Routes is a function that registers a group of routes
+	Routes func(r *echo.Group, l *logrus.Logger) error
+)
+
+// RegisterRoute mounts a set of routes
+func (s *Server) RegisterRoute(path string, r Routes, m ...echo.MiddlewareFunc) error {
+	return r(s.i.Group(path, m...), s.log)
 }
