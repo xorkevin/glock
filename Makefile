@@ -10,7 +10,7 @@ PORT=8080
 
 SERVE_IMAGE_NAME=glockserver
 SERVE_CONTAINER_NAME=sglock
-VERSION=v1
+VERSION=v0.1.0
 
 
 all: build
@@ -44,7 +44,7 @@ build-docker: build
 
 
 run-docker:
-	docker run -it --rm --name $(SERVE_CONTAINER_NAME) -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
+	docker run -it --rm --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
 
 
 docker: build-docker run-docker

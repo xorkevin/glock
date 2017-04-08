@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	g := server.New()
+	g := server.New(server.NewConfig())
 	g.SetLoggingLevel(server.LevelDebug)
 	g.RegisterRoute("/api/health", rHealth.Route)
 	g.Start(8080)

@@ -9,15 +9,28 @@ import (
 )
 
 type (
+	// Config is the server configuration
+	Config struct {
+		Version string
+	}
+
 	// Server is an http gateway
 	Server struct {
-		i   *echo.Echo
-		log *logrus.Logger
+		i      *echo.Echo
+		log    *logrus.Logger
+		config Config
 	}
 )
 
+// NewConfig creates a new server configuration
+func NewConfig() Config {
+	return Config{
+		Version: os.Getenv("VERSION"),
+	}
+}
+
 // New creates a new Server
-func New() *Server {
+func New(config Config) *Server {
 	// logger
 	l := logrus.New()
 	l.Formatter = &logrus.TextFormatter{}
@@ -32,8 +45,9 @@ func New() *Server {
 	i.Use(middleware.RemoveTrailingSlash())
 
 	return &Server{
-		i:   i,
-		log: l,
+		i:      i,
+		log:    l,
+		config: config,
 	}
 }
 
@@ -80,10 +94,10 @@ func (s *Server) SetLoggingLevel(level int) {
 
 type (
 	// Routes is a function that registers a group of routes
-	Routes func(r *echo.Group, l *logrus.Logger) error
+	Routes func(c Config, r *echo.Group, l *logrus.Logger) error
 )
 
 // RegisterRoute mounts a set of routes
 func (s *Server) RegisterRoute(path string, r Routes, m ...echo.MiddlewareFunc) error {
-	return r(s.i.Group(path, m...), s.log)
+	return r(s.config, s.i.Group(path, m...), s.log)
 }
