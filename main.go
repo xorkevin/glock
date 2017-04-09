@@ -102,13 +102,16 @@ func New(config Config) *Server {
 	i := echo.New()
 
 	// middleware
+	i.Pre(middleware.RemoveTrailingSlash())
 	if config.LogLevel == levelDebug {
 		i.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 			Format: "time=${time_rfc3339}, method=${method}, uri=${uri}, status=${status}, latency=${latency_human}\n",
 		}))
 	}
+	i.Use(middleware.BodyLimit("2M"))
+	i.Use(middleware.CORS())
 	i.Use(middleware.Recover())
-	i.Use(middleware.RemoveTrailingSlash())
+	i.Use(middleware.Gzip())
 
 	return &Server{
 		i:      i,
