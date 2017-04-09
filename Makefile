@@ -87,4 +87,8 @@ pg-setup:
   docker volume create --name $(POSTGRES_VOLUME)
 
 pg-run:
-  docker run -it --rm --name $(POSTGRES_CONTAINER) -p 5432:5432 -v $(POSTGRES_VOLUME):/var/lib/postgresql/data -e POSTGRES_PASSWORD=$(POSTGRES_PASS) postgres:alpine
+  docker run -d --name $(POSTGRES_CONTAINER) -p 5432:5432 -v $(POSTGRES_VOLUME):/var/lib/postgresql/data -e POSTGRES_PASSWORD=$(POSTGRES_PASS) postgres:alpine
+
+pg-stop:
+  if [ "$$(docker ps -q -f name=$(POSTGRES_CONTAINER) -f status=running)" ]; then docker stop $(POSTGRES_CONTAINER); fi
+  if [ "$$(docker ps -q -f name=$(POSTGRES_CONTAINER) -f status=exited)" ]; then docker rm $(POSTGRES_CONTAINER); fi
