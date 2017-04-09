@@ -1,6 +1,7 @@
 # METADATA
 VERSION=v0.1.0
 PORT=8080
+BASEDIR=public
 
 
 # CMD
@@ -10,6 +11,12 @@ BIN_OUT=bin
 SERVE_NAME=serve
 SERVE_PATH=cmd/serve/main.go
 SERVE_BIN_PATH=$(BIN_OUT)/$(SERVE_NAME)
+
+## fsserve
+## serve
+FSSERVE_NAME=fsserve
+FSSERVE_PATH=cmd/fsserve/main.go
+FSSERVE_BIN_PATH=$(BIN_OUT)/$(FSSERVE_NAME)
 
 
 # DOCKER
@@ -29,8 +36,12 @@ POSTGRES_PASS=admin
 all: build
 
 
-dev: $(SERVE_PATH)
+dev:
   VERSION=$(VERSION) MODE=DEBUG go run $(SERVE_PATH)
+
+
+dev-fsserve:
+  BASEDIR=$(BASEDIR) go run $(FSSERVE_PATH)
 
 
 clean:
@@ -43,11 +54,13 @@ build-serve:
   CGO_ENABLED=0 go build -a -tags netgo -ldflags '-w -s' -o $(SERVE_BIN_PATH) $(SERVE_PATH)
 
 
-build: clean build-serve
+build-fsserve:
+  mkdir -p $(BIN_OUT)
+  if [ -f $(FSSERVE_BIN_PATH) ]; then rm $(FSSERVE_BIN_PATH);	fi
+  CGO_ENABLED=0 go build -a -tags netgo -ldflags '-w -s' -o $(FSSERVE_BIN_PATH) $(FSSERVE_PATH)
 
 
-run:
-  VERSION=$(VERSION) MODE=INFO ./$(SERVE_BIN_PATH)
+build: clean build-serve build-fsserve
 
 
 ## docker
