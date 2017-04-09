@@ -1,0 +1,5 @@
+FROM scratch
+MAINTAINER xorkevin
+COPY bin/fsserve /
+EXPOSE 3000
+CMD ["/fsserve"]

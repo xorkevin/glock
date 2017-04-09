@@ -1,6 +1,8 @@
 # METADATA
 VERSION=v0.1.0
-PORT=8080
+MODE=INFO
+API_PORT=8080
+FSS_PORT=3000
 BASEDIR=public
 
 
@@ -22,6 +24,8 @@ FSSERVE_BIN_PATH=$(BIN_OUT)/$(FSSERVE_NAME)
 # DOCKER
 SERVE_IMAGE_NAME=glockserver
 SERVE_CONTAINER_NAME=sglock
+FSSERVE_IMAGE_NAME=glockfsserver
+FSSERVE_CONTAINER_NAME=fssglock
 
 
 # DEV_POSTGRES
@@ -56,7 +60,7 @@ build-serve:
 
 build-fsserve:
   mkdir -p $(BIN_OUT)
-  if [ -f $(FSSERVE_BIN_PATH) ]; then rm $(FSSERVE_BIN_PATH);	fi
+  if [ -f $(FSSERVE_BIN_PATH) ]; then rm $(FSSERVE_BIN_PATH); fi
   CGO_ENABLED=0 go build -a -tags netgo -ldflags '-w -s' -o $(FSSERVE_BIN_PATH) $(FSSERVE_PATH)
 
 
@@ -67,11 +71,17 @@ build: clean build-serve build-fsserve
 docker-build: build
   docker build -t $(SERVE_IMAGE_NAME):$(VERSION) .
   docker build -t $(SERVE_IMAGE_NAME) .
+  docker build -f FSDockerfile -t $(FSSERVE_IMAGE_NAME) .
 
 
 docker-run:
-  docker run -it --rm --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -e MODE=INFO -p $(PORT):$(PORT) $(SERVE_IMAGE_NAME)
+  docker run -d --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -e MODE=$(MODE) -p $(API_PORT):$(API_PORT) $(SERVE_IMAGE_NAME)
+  docker run -d --name $(FSSERVE_CONTAINER_NAME) -e BASEDIR=$(BASEDIR) -p $(FSS_PORT):$(FSS_PORT) $(SERVE_IMAGE_NAME)
 
+
+docker-stop:
+  docker stop $(SERVE_CONTAINER_NAME)
+  docker stop $(FSSERVE_CONTAINER_NAME)
 
 docker: docker-build docker-run
 
