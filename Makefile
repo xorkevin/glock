@@ -76,7 +76,7 @@ docker-build: build
 
 docker-run:
   docker run -d --name $(SERVE_CONTAINER_NAME) -e VERSION=$(VERSION) -e MODE=$(MODE) -p $(API_PORT):$(API_PORT) $(SERVE_IMAGE_NAME)
-  docker run -d --name $(FSSERVE_CONTAINER_NAME) -e BASEDIR=$(BASEDIR) -p $(FSS_PORT):$(FSS_PORT) $(FSSERVE_IMAGE_NAME)
+  docker run -d --name $(FSSERVE_CONTAINER_NAME) -e BASEDIR=$(BASEDIR) -v $$(pwd)/$(BASEDIR):/$(BASEDIR) -p $(FSS_PORT):$(FSS_PORT) $(FSSERVE_IMAGE_NAME)
 
 
 docker-stop:
