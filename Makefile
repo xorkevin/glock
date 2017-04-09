@@ -71,7 +71,7 @@ build: clean build-serve build-fsserve
 docker-build: build
   docker build -t $(SERVE_IMAGE_NAME):$(VERSION) .
   docker build -t $(SERVE_IMAGE_NAME) .
-  docker build -f FSDockerfile -t $(FSSERVE_IMAGE_NAME) .
+  docker build -f Dockerfile.fs -t $(FSSERVE_IMAGE_NAME) .
 
 
 docker-run:
@@ -80,12 +80,13 @@ docker-run:
 
 
 docker-stop:
-  docker stop $(SERVE_CONTAINER_NAME)
-  docker stop $(FSSERVE_CONTAINER_NAME)
-  docker rm $(SERVE_CONTAINER_NAME)
-  docker rm $(FSSERVE_CONTAINER_NAME)
+  if [ "$$(docker ps -q -f name=$(SERVE_CONTAINER_NAME) -f status=running)" ]; then docker stop $(SERVE_CONTAINER_NAME); fi
+  if [ "$$(docker ps -q -f name=$(FSSERVE_CONTAINER_NAME) -f status=running)" ]; then docker stop $(FSSERVE_CONTAINER_NAME); fi
+  if [ "$$(docker ps -q -f name=$(SERVE_CONTAINER_NAME) -f status=exited)" ]; then docker rm $(SERVE_CONTAINER_NAME); fi
+  if [ "$$(docker ps -q -f name=$(FSSERVE_CONTAINER_NAME) -f status=exited)" ]; then docker rm $(FSSERVE_CONTAINER_NAME); fi
 
-docker: docker-build docker-run
+
+docker: docker-stop docker-build docker-run
 
 
 ## postgres
